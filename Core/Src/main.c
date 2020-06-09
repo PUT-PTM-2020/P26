@@ -50,8 +50,9 @@ UART_HandleTypeDef huart3;
 /* USER CODE BEGIN PV */
 double value;// variable for reading the ADC value
 double toServo;
-uint8_t receiveUART[1];
-uint16_t sizeReceiveUART = 1;
+double v1,v2;
+uint8_t receiveUART[2];
+uint16_t sizeReceiveUART = 2;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -113,13 +114,30 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 	  HAL_UART_Receive_IT(&huart3, receiveUART, sizeReceiveUART);
-	 	  if(receiveUART[0] == '1'){
+	  v1= receiveUART[0];
+	  v2= receiveUART[1];
+	 	  if(receiveUART[0] == 1 && receiveUART[1] < 60){
+	 		 HAL_GPIO_WritePin(GPIOD,GPIO_PIN_14,GPIO_PIN_RESET);
 	 		  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_12,GPIO_PIN_SET);
 	 	  }
-	 	  else if(receiveUART[0] == '0'){
+	 	  else if (receiveUART[0] == 1 && receiveUART[1] > 60) {
 	 		  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_12,GPIO_PIN_RESET);
+			  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_14,GPIO_PIN_SET);
 	 	  }
-
+	 	  else if(receiveUART[0] == 2 && receiveUART[1] < 60){
+	 	 	  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_13,GPIO_PIN_RESET);
+	 	 	  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_15,GPIO_PIN_SET);
+	 	  }
+	 	  else if (receiveUART[0] == 2 && receiveUART[1] > 60) {
+		  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_15,GPIO_PIN_RESET);
+		  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_13,GPIO_PIN_SET);
+	 	  }
+	  	  else{
+	  		HAL_GPIO_WritePin(GPIOD,GPIO_PIN_12,GPIO_PIN_RESET);
+	  		HAL_GPIO_WritePin(GPIOD,GPIO_PIN_14,GPIO_PIN_RESET);
+	      HAL_GPIO_WritePin(GPIOD,GPIO_PIN_13,GPIO_PIN_RESET);
+	      HAL_GPIO_WritePin(GPIOD,GPIO_PIN_15,GPIO_PIN_RESET);
+	 	  }
 	  HAL_ADC_Start(&hadc1);
 
 	  if(HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK)
@@ -322,10 +340,10 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOC_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : PD12 */
-  GPIO_InitStruct.Pin = GPIO_PIN_12;
+  /*Configure GPIO pins : PD12 PD13 PD14 PD15 */
+  GPIO_InitStruct.Pin = GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
