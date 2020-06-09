@@ -48,6 +48,7 @@ TIM_HandleTypeDef htim2;
 /* USER CODE BEGIN PV */
 double value;// variable for reading the ADC value
 double toServo;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -106,6 +107,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
 	  HAL_ADC_Start(&hadc1);
 
 	  if(HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK)
